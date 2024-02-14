@@ -1,24 +1,24 @@
-const fs = require('fs/promises');
-const path = require('path');
-const { nanoid } = require('nanoid');
+import fs from 'fs/promises';
+import { nanoid } from 'nanoid';
+import path from 'path';
 
-const CONTACT_PATH = path.join(__dirname, 'db', 'contacts.json');
+const CONTACT_PATH = path.resolve('db', 'contacts.json');
 
-const getAllContacts = async () => {
+export const listContacts = async () => {
   const data = await fs.readFile(CONTACT_PATH, { encoding: 'utf-8' });
 
   return JSON.parse(data);
 };
 
-const getContactById = async (id) => {
-  const data = await getAllContacts();
+export const getContactById = async (id) => {
+  const data = await listContacts();
 
   const contact = data.find((el) => el.id === id);
   return contact || null;
 };
 
-const addContact = async (contact) => {
-  const contactsList = await getAllContacts();
+export const addContact = async (contact) => {
+  const contactsList = await listContacts();
 
   const newContact = {
     name: contact.name,
@@ -32,8 +32,8 @@ const addContact = async (contact) => {
   return newContact;
 };
 
-const removeContact = async (id) => {
-  const contactsList = await getAllContacts();
+export const removeContact = async (id) => {
+  const contactsList = await listContacts();
 
   const index = contactsList.findIndex((el) => el.id === id);
   if (index === -1) return null;
@@ -44,9 +44,13 @@ const removeContact = async (id) => {
   return removedContact || null;
 };
 
-module.exports = {
-  getAllContacts,
-  getContactById,
-  addContact,
-  removeContact,
+export const updateContactById = async (id, data) => {
+  const contacts = await listContacts();
+  const index = contacts.findIndex((item) => item.id === id);
+  if (index === -1) {
+    return null;
+  }
+  contacts[index] = { ...contacts[index], ...data };
+  await fs.writeFile(CONTACT_PATH, JSON.stringify(contacts, null, 2));
+  return contacts[index];
 };
