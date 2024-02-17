@@ -1,28 +1,43 @@
 import * as contactsService from '../services/contactsServices.js';
 import HttpError from '../helpers/HttpError.js';
 
-export const getAllContacts = async (req, res) => {
-  const result = await contactsService.listContacts();
-  res.status(200).json(result);
+export const getAllContacts = async (req, res, next) => {
+  try {
+    const result = await contactsService.listContacts();
+    res.status(200).json(result);
+    if (!result) {
+      throw HttpError(401, 'Bad Request');
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const getOneContact = async (req, res) => {
-  const { id } = req.params;
-  const result = await contactsService.getContactById(id);
-  if (!result) {
-    res.status(404).json({ message: 'Not Found' });
-    throw HttpError(404, 'Not Found');
+export const getOneContact = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await contactsService.getContactById(id);
+    if (!result) {
+      throw HttpError(404, 'Not Found');
+    }
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
   }
-  res.status(200).json(result);
 };
 
-export const deleteContact = async (req, res) => {
-  const { id } = req.params;
-  const result = await contactsService.removeContact(id);
-  if (!result) {
-    throw HttpError(404);
+export const deleteContact = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await contactsService.removeContact(id);
+
+    if (!result) {
+      throw HttpError(404, `Contact with ID:${id} not found`);
+    }
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
   }
-  res.status(200).json(result);
 };
 
 export const createContact = async (req, res, next) => {
