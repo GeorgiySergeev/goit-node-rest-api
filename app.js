@@ -10,7 +10,7 @@ const app = express();
 
 mongoose
   .connect(process.env.DB_URI)
-  .then((con) => {
+  .then((conect) => {
     console.log('Database connection successful');
     // console.log(con);
   })
