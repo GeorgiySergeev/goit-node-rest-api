@@ -1,6 +1,10 @@
 import express from 'express';
 import validateBody from '../helpers/validateBody.js';
-import { createContactSchema, updateContactSchema } from '../schemas/contactsSchemas.js';
+import {
+  createContactSchema,
+  updateContactSchema,
+  updateContactStatus,
+} from '../schemas/contactsSchemas.js';
 import {
   getAllContacts,
   getOneContact,
@@ -22,6 +26,6 @@ contactsRouter.post('/', validateBody(createContactSchema), createContact);
 
 contactsRouter.put('/:id', validateBody(updateContactSchema), updateContact);
 
-contactsRouter.patch('/:id', updateStatusContact);
+contactsRouter.patch('/:id', validateBody(updateContactStatus), updateStatusContact);
 
 export default contactsRouter;

@@ -14,3 +14,7 @@ export const updateContactSchema = Joi.object({
 })
   .min(1)
   .message('Body must have at least one field');
+
+export const updateContactStatus = Joi.object({
+  favorite: Joi.boolean().required(),
+});
