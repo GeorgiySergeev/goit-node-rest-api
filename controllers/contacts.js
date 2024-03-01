@@ -3,7 +3,7 @@ import Contact from '../model/contact-model.js';
 
 import { matchOwner } from '../helpers/checkOwner.js';
 
-export const getAllContacts = async (req, res, next) => {
+const getAllContacts = async (req, res, next) => {
   const { page, limit, favorite } = req.query;
   const filter = { owner: req.user.id };
 
@@ -25,7 +25,7 @@ export const getAllContacts = async (req, res, next) => {
   }
 };
 
-export const getOneContact = async (req, res, next) => {
+const getOneContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     const result = await Contact.findById(id);
@@ -42,16 +42,11 @@ export const getOneContact = async (req, res, next) => {
   }
 };
 
-export const deleteContact = async (req, res, next) => {
+const deleteContact = async (req, res, next) => {
   try {
     const { id } = req.params;
 
     matchOwner(id, req.user.id);
-
-    // const contact = await Contact.findById(id);
-    // if (contact.owner.toString() !== req.user.id) {
-    //   throw HttpError(404, 'Not Found');
-    // }
 
     const result = await Contact.findByIdAndDelete(id);
 
@@ -65,7 +60,7 @@ export const deleteContact = async (req, res, next) => {
   }
 };
 
-export const createContact = async (req, res, next) => {
+const createContact = async (req, res, next) => {
   try {
     const result = await Contact.create({ ...req.body, owner: req.user.id });
 
@@ -79,16 +74,10 @@ export const createContact = async (req, res, next) => {
   }
 };
 
-export const updateContact = async (req, res, next) => {
+const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     matchOwner(id, req.user.id);
-
-    // const contact = await Contact.findById(id);
-
-    // if (contact.owner.toString() !== req.user.id) {
-    //   throw HttpError(404, 'Not Found');
-    // }
 
     const { name, email, phone, favorite } = req.body;
     const result = await Contact.findByIdAndUpdate(
@@ -105,16 +94,10 @@ export const updateContact = async (req, res, next) => {
   }
 };
 
-export const updateStatusContact = async (req, res, next) => {
+const updateStatusContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     matchOwner(id, req.user.id);
-
-    // const contact = await Contact.findById(id);
-
-    // if (contact.owner.toString() !== req.user.id) {
-    //   throw HttpError(404, 'Not Found');
-    // }
 
     const result = await Contact.findByIdAndUpdate(id, req.body, { new: true });
 
@@ -127,3 +110,13 @@ export const updateStatusContact = async (req, res, next) => {
     next(error);
   }
 };
+
+const ctrl = {
+  getAllContacts,
+  getOneContact,
+  deleteContact,
+  createContact,
+  updateContact,
+  updateStatusContact,
+};
+export default ctrl;

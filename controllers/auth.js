@@ -7,7 +7,7 @@ import User from '../model/user-model.js';
 
 const { SECRET_KEY } = process.env;
 
-export const register = async (req, res, next) => {
+const register = async (req, res, next) => {
   const { email, password } = req.body;
   const normalizedEmail = email.toLowerCase();
 
@@ -38,7 +38,7 @@ export const register = async (req, res, next) => {
   }
 };
 
-export const login = async (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
   const normalizedEmail = email.toLowerCase();
 
@@ -74,11 +74,7 @@ export const login = async (req, res, next) => {
     next(error);
   }
 };
-
-export const logout = async (req, res, next) => {
-  // console.log(req.user);
-  // res.json({ message: 'logout endpoint test' });
-
+const logout = async (req, res, next) => {
   try {
     await User.findByIdAndUpdate(req.user.id, { token: null });
     res.json('user logaut');
@@ -89,7 +85,7 @@ export const logout = async (req, res, next) => {
   }
 };
 
-export const current = async (req, res, next) => {
+const current = async (req, res, next) => {
   try {
     const current = await User.findById(req.user.id);
     const responseBody = {
@@ -102,8 +98,7 @@ export const current = async (req, res, next) => {
   }
 };
 
-export const updateSubscription = async (req, res, next) => {
-  // res.json('update router test');
+const updateSubscription = async (req, res, next) => {
   const { subscription } = req.body;
   try {
     const contact = await User.findById(req.user.id);
@@ -116,3 +111,13 @@ export const updateSubscription = async (req, res, next) => {
     next(error);
   }
 };
+
+const ctrl = {
+  register,
+  login,
+  logout,
+  current,
+  updateSubscription,
+};
+
+export default ctrl;
