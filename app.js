@@ -2,9 +2,11 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import mongoose from 'mongoose';
+
 import 'dotenv/config.js';
 
 import contactsRouter from './routes/contactsRouter.js';
+import authRouter from './routes/authRouter.js';
 
 const app = express();
 
@@ -12,7 +14,6 @@ mongoose
   .connect(process.env.DB_URI)
   .then((conect) => {
     console.log('Database connection successful');
-    // console.log(con);
   })
   .catch((error) => {
     console.log(error);
@@ -23,6 +24,7 @@ app.use(morgan('tiny'));
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/users', authRouter);
 app.use('/api/contacts', contactsRouter);
 
 app.use((_, res) => {
