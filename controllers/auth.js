@@ -74,6 +74,7 @@ const login = async (req, res, next) => {
     next(error);
   }
 };
+
 const logout = async (req, res, next) => {
   try {
     await User.findByIdAndUpdate(req.user.id, { token: null });
@@ -87,10 +88,12 @@ const logout = async (req, res, next) => {
 const current = async (req, res, next) => {
   try {
     const current = await User.findById(req.user.id);
+
     const responseBody = {
       email: current.email,
       subscription: current.subscription,
     };
+
     res.json(responseBody);
   } catch (error) {
     next(error);
