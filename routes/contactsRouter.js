@@ -1,38 +1,41 @@
 import express from 'express';
+
 import validateBody from '../middlewares/validateBody.js';
+import authenticate from '../middlewares/auth.js';
+import ctrl from '../controllers/contacts.js';
+
 import {
   createContactSchema,
   updateContactSchema,
   updateContactStatusSchema,
 } from '../schemas/contactsSchemas.js';
-import {
-  getAllContacts,
-  getOneContact,
-  deleteContact,
-  createContact,
-  updateContact,
-  updateStatusContact,
-} from '../controllers/contactsControllers.js';
 
 import isValidId from '../middlewares/validateId.js';
 
 const contactsRouter = express.Router();
 
-contactsRouter.get('/', getAllContacts);
+contactsRouter.get('/', authenticate, ctrl.getAllContacts);
 
-contactsRouter.get('/:id', isValidId, getOneContact);
+contactsRouter.get('/:id', authenticate, isValidId, ctrl.getOneContact);
 
-contactsRouter.delete('/:id', isValidId, deleteContact);
+contactsRouter.delete('/:id', authenticate, isValidId, ctrl.deleteContact);
 
-contactsRouter.post('/', validateBody(createContactSchema), createContact);
+contactsRouter.post('/', authenticate, validateBody(createContactSchema), ctrl.createContact);
 
-contactsRouter.put('/:id', isValidId, validateBody(updateContactSchema), updateContact);
+contactsRouter.put(
+  '/:id',
+  authenticate,
+  isValidId,
+  validateBody(updateContactSchema),
+  ctrl.updateContact,
+);
 
 contactsRouter.patch(
   '/:id/favorite',
+  authenticate,
   isValidId,
   validateBody(updateContactStatusSchema),
-  updateStatusContact,
+  ctrl.updateStatusContact,
 );
 
 export default contactsRouter;
