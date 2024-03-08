@@ -20,6 +20,11 @@ const userModel = new Schema(
       type: String,
       default: null,
     },
+    avatarURL: {
+      type: String,
+      default: null,
+      // required: true,
+    },
   },
   { versionKey: false, timestamps: true },
 );

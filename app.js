@@ -24,6 +24,7 @@ app.use(morgan('tiny'));
 app.use(cors());
 app.use(express.json());
 
+app.use(express.static('public'));
 app.use('/api/users', authRouter);
 app.use('/api/contacts', contactsRouter);
 
@@ -36,9 +37,9 @@ app.use((err, req, res, next) => {
   res.status(status).json({ message });
 });
 
-app.get('/', (req, res) => {
-  res.send('Home page');
-});
+// app.get('/avatars', (req, res) => {
+//   res.send('Home page');
+// });
 
 app.listen(3000, () => {
   console.log('Server is running. Use our API on port: 3000');

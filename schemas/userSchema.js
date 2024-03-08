@@ -6,5 +6,5 @@ export const authUserSchema = new Joi.object({
 });
 
 export const updateUserSchema = Joi.object({
-  subscription: Joi.string().valid('starter', 'pro', 'business').required(),
+  subscription: Joi.string().valid('starter', 'pro', 'business'),
 });
