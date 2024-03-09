@@ -13,10 +13,6 @@ import User from '../model/user-model.js';
 
 const { SECRET_KEY } = process.env;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const avatarsDirectory = path.join(__dirname, '../', 'public', 'avatars');
-
 const register = async (req, res, next) => {
   const { email, password } = req.body;
   const normalizedEmail = email.toLowerCase();
@@ -128,15 +124,19 @@ const updateSubscription = async (req, res, next) => {
 
 const uploadAvatar = async (req, res, next) => {
   const { id } = req.user;
-  const { path: tempPath, filename } = req.file;
 
   try {
+    if (!req.file) {
+      throw HttpError(400, 'File not uploaded');
+    }
+    const { path: tempPath, filename } = req.file;
+
+    const resizeAvatar = await Jimp.read(tempPath);
+    resizeAvatar.resize(250, 250).write(tempPath);
+
     await fs.rename(tempPath, path.join(process.cwd(), 'public/avatars', filename));
 
-    const avatarURL = path.join(avatarsDirectory, filename);
-
-    const resizeAvatar = await Jimp.read(avatarURL);
-    resizeAvatar.resize(250, 250).write(avatarURL);
+    const avatarURL = path.join('/avatars', filename);
 
     const user = await User.findByIdAndUpdate(id, { avatarURL }, { new: true });
     if (!user) {
@@ -161,7 +161,7 @@ const getAvatar = async (req, res, next) => {
       throw new HttpError(404, 'Avatar not found');
     }
 
-    res.sendFile(path.join(process.cwd(), 'public/avatars', user.avatarURL));
+    res.sendFile(path.join(process.cwd(), 'public', user.avatarURL));
   } catch (error) {
     next(error);
   }
