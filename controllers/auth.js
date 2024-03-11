@@ -1,5 +1,11 @@
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import bcrypt from 'bcrypt';
 import Jwt from 'jsonwebtoken';
+import gravatar from 'gravatar';
+import Jimp from 'jimp';
 import 'dotenv/config.js';
 
 import HttpError from '../helpers/HttpError.js';
@@ -19,7 +25,9 @@ const register = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ email, password: hashedPassword });
+    const avatarURL = gravatar.url(email);
+
+    const newUser = await User.create({ email, password: hashedPassword, avatarURL });
 
     const responseBody = {
       user: {
@@ -103,12 +111,57 @@ const current = async (req, res, next) => {
 const updateSubscription = async (req, res, next) => {
   const { subscription } = req.body;
   try {
-    const contact = await User.findById(req.user.id);
+    const user = await User.findByIdAndUpdate(req.user.id, { subscription });
     const responseBody = {
-      email: contact.email,
+      email: user.email,
       subscription,
     };
     res.json(responseBody);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const uploadAvatar = async (req, res, next) => {
+  const { id } = req.user;
+
+  try {
+    if (!req.file) {
+      throw HttpError(400, 'File not uploaded');
+    }
+    const { path: tempPath, filename } = req.file;
+
+    const resizeAvatar = await Jimp.read(tempPath);
+    resizeAvatar.resize(250, 250).write(tempPath);
+
+    await fs.rename(tempPath, path.join(process.cwd(), 'public/avatars', filename));
+
+    const avatarURL = path.join('/avatars', filename);
+
+    const user = await User.findByIdAndUpdate(id, { avatarURL }, { new: true });
+    if (!user) {
+      throw HttpError(404, 'User not found');
+    }
+    res.json({ avatarURL: user.avatarURL });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getAvatar = async (req, res, next) => {
+  const { id } = req.user;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      throw new HttpError(404, 'User not found');
+    }
+
+    if (user.avatarURL === null) {
+      throw new HttpError(404, 'Avatar not found');
+    }
+
+    res.sendFile(path.join(process.cwd(), 'public', user.avatarURL));
   } catch (error) {
     next(error);
   }
@@ -120,6 +173,8 @@ const ctrl = {
   logout,
   current,
   updateSubscription,
+  uploadAvatar,
+  getAvatar,
 };
 
 export default ctrl;
