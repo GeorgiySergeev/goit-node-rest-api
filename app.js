@@ -2,14 +2,43 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import mongoose from 'mongoose';
+// import sgMail from '@sendgrid/mail';
 
 import 'dotenv/config.js';
 
 import contactsRouter from './routes/contactsRouter.js';
 import authRouter from './routes/authRouter.js';
+import sendEmail from './helpers/sendEmail.js';
 
 const app = express();
 
+// ! =======================================Email
+// const testEmail = {
+//   to: 'juliyavoice@ukr.net',
+//   subject: 'Test email@4',
+//   html: '<h1>Hello from Email server!</h1>',
+// };
+// const verifyEmail = {
+//   to: 'juliyavoice@ukr.net',
+//   subject: 'Verification email ',
+//   html: `<a href ="http://localhost:3000/api/users/verify/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" target="_blank"> Hello, please, verify your email</a>`,
+// };
+
+// sendEmail(verifyEmail);
+
+// const { SENDGRID_API_KEY } = process.env;
+// sgMail.setApiKey(SENDGRID_API_KEY);
+
+// const email = {
+//   to: 's.georgiy@protonmail.com',
+//   from: 'georgiy-mail@meta.ua',
+//   subject: 'test-mail',
+//   html: '<h1>Test Mail</h1>',
+// };
+
+// const result = await sgMail.send(email);
+// console.log(result);
+// ! ===========================================
 mongoose
   .connect(process.env.DB_URI)
   .then((conect) => {
