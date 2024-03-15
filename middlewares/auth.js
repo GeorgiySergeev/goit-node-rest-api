@@ -20,14 +20,18 @@ const authenticate = async (req, res, next) => {
       next(HttpError(401));
     }
 
+    if (user.verify === false) {
+      throw HttpError(401, 'Your account is not ferified');
+    }
+
     req.user = {
       id: user.id,
       email: user.email,
     };
 
     next();
-  } catch {
-    next(HttpError(401));
+  } catch (error) {
+    next(error);
   }
 };
 export default authenticate;
